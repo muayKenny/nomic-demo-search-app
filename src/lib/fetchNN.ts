@@ -1,7 +1,6 @@
 import { Deeptable, Tile } from 'deepscatter';
 import { AtlasDataset, AtlasProjection, AtlasUser } from '@nomic-ai/atlas'
 import stableStringify from 'json-stable-stringify';
-import { Md5 } from 'ts-md5';
 import {
   Float32,
   List,
@@ -122,7 +121,7 @@ export async function fetchNeighbors({input, projectId, k,
     project_id: dataset.id,
 //    index_id: await projection.index().then(d => d.id),
     datum_ids: records.map(d => d[primaryKey]),
-  })) as { atoms: { [key: string]: any } };
+  })) as { datums: { [key: string]: any } };
 
   return records.map((a, i) => {
     return {...a, ...datums[i]}
@@ -150,7 +149,7 @@ export function ensureDistanceToEmbeddingColumnExists(
 
   const key =
     '_distance_statistic_' +
-    Md5.hashStr(stableStringify({ embedding: embedding, statistic, taskType }));
+    stableStringify({ embedding: embedding, statistic, taskType });
   if (dataset.transformations[key]) {
     return key;
   }
