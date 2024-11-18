@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Nomic Web Engineer Interview Assignment
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+The goal of this assignment is to gain insight into your ability to understand an existing web architecture, assess opportunities and challenges in the application, and make decisions about how to improve it.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+In the interview that follows this assignment, we will discuss the code you wrote, the decisions you made, and the challenges and opportunities you encountered.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Task
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You have been given a simple Next.js application that displays the results of our vector search endpoint. Your goal is to understand the codebase, identify opportunities for improvement, and implement those improvements as one or more pull requests.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Your improvements can involve any aspect of the application, including (but not limited to) the user interface, website functionality, API calls, data processing, framework/architecture, or code quality.
 
-## Learn More
+### Requirements
 
-To learn more about Next.js, take a look at the following resources:
+- Spend no more than 3 hours on this assignment. We are assessing how you approach the problem and think through the challenges, not how much code you can write in a short period of time.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Create one or more PRs with your improvements. In each PR, include a brief description of the changes you made and why you made them at the bottom of this README.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- You are encouraged to use LLMs in whatever way you see fit. You should be prepared to discuss both architectural decisions and low-level implementations in the interview.
 
-## Deploy on Vercel
+## Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Place this repository in a local folder on your machine. It already contains a git repository.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+2. Install the npm dependencies
+
+3. Create a `.env` file in the root of the project with the following content:
+
+   ```bash
+   PRIVATE_ATLAS_API_KEY=<your provided atlas api key>
+   ```
+
+   You should have recieved an API key in the email with this assignment.
+
+4. Run the development server
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   # or
+   bun dev
+   ```
+
+5. Navigate to the localhost URL provided in the console output. The search page can be found at `/search`.
+
+_If you have issues with setting up the website, please reach out._
+
+## Resources
+
+Here are some resources that might be helpful as you work on this assignment:
+
+- [Next.js App Router Documentation](https://nextjs.org/docs)
+- [Atlas kNN Search Documentation](https://docs.nomic.ai/reference/api/query/k-nn-search) - other atlas API documentation can be found in the sidebar
+- [Underlying Atlas Dataset](https://atlas.nomic.ai/data/nomic-multimodal-series/cc3m-100k-image-bytes-v15) - This is the default dataset we are querying against
+- [Atlas Typescript SDK](https://github.com/nomic-ai/ts-nomic) - lightly documented but useful to if you want to understand the underlying types
+
+---
+
+---
+
+## Changes Made
+
+_Please describe the changes you made and why you made them here._
