@@ -12,7 +12,7 @@ In the interview that follows this exercise, we will discuss the code you wrote,
 
 ## Task
 
-You have been given a simple Next.js application that displays the results of our vector search endpoint. Your goal is to understand the codebase, identify opportunities for improvement or alternate functionalities, and implement those improvements as a new git branch..
+You have been given a simple Next.js application that displays the results of our vector search endpoint. Your goal is to understand the codebase, identify opportunities for improvement or alternate functionalities, and implement those improvements as a new git branch.
 
 Your improvements can involve any aspect of the application, including (but not limited to) the user interface, website functionality, API calls, data processing, framework/architecture, or code quality.
 
@@ -33,7 +33,7 @@ Your improvements can involve any aspect of the application, including (but not 
 
 1. Place this repository in a local folder on your machine. It already contains a git repository.
 
-2. Install the npm dependencies
+2. Install the npm dependencies with `npm i`
 
 3. Create a `.env` file in the root of the project with the following content:
 
