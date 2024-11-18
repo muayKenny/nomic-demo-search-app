@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 type Result = {
   id: string;
-  _distance: number;
+  _similarity: number;
   text: string;
   img: string;
 };
@@ -18,7 +18,6 @@ const SearchResults = ({ results }: SearchResultsProps) => {
         <div key={result.id} className="bg-white p-4 rounded shadow dark:bg-gray-800">
           <div dangerouslySetInnerHTML={{ __html: result.img }} />
           <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">{result.text}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Similarity: {result._distance}</p>
         </div>
       ))}
     </div>
