@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AtlasViewer, AtlasDataset } from '@nomic-ai/atlas';
 
 export async function GET(req: NextRequest) {
+  // Zod schema validations for paramters
   const { searchParams } = new URL(req.url);
   const input = searchParams.get('input')!;
   const k = searchParams.get('k') || '10';
-  // digest filters and build filter array!
 
   if (!input) {
     return NextResponse.json(
@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
       { status: 400 }
     );
   }
-
   // Default projection and dataset IDs for KNN queries.
   // These can be overridden by providing 'projectionId' and 'datasetId' as query parameters.
   const projectionId =
@@ -107,9 +106,19 @@ export async function GET(req: NextRequest) {
     // Log the error for debugging
     console.error('Error in KNN query:', error);
 
-    // Return a generic error response to the client
+    // Handle specific error cases
+    if (error instanceof Error) {
+      if (error.message.includes('Request failed with status')) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      if (error.message.includes('Invalid response structure')) {
+        return NextResponse.json({ error: error.message }, { status: 422 });
+      }
+    }
+
+    // Fallback for unexpected errors
     return NextResponse.json(
-      { error: 'Failed to fetch neighbors. Please try again later.' },
+      { error: 'An unexpected error occurred. Please try again later.' },
       { status: 500 }
     );
   }
