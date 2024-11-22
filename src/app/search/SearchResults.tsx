@@ -1,3 +1,5 @@
+import { extractSrc } from '@/utils/utils';
+
 type Result = {
   id: string;
   img_text_sim: number;
@@ -7,34 +9,9 @@ type Result = {
 
 interface SearchResultsProps {
   results: Result[];
-  isLoading?: boolean;
-  error?: string;
 }
 
-const SearchResults = ({ results, isLoading, error }: SearchResultsProps) => {
-  const extractSrc = (htmlString: string) => {
-    const matches = htmlString.match(/src="([^"]+)"/);
-    return matches ? matches[1] : '';
-  };
-  console.log(results);
-
-  if (error) {
-    return <div className='text-red-500'>Error: {error}</div>;
-  }
-
-  if (isLoading) {
-    return (
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className='animate-pulse bg-gray-200 dark:bg-gray-700 h-64 rounded'
-          ></div>
-        ))}
-      </div>
-    );
-  }
-
+const SearchResults = ({ results }: SearchResultsProps) => {
   if (results.length === 0) {
     return (
       <div className='text-gray-500 dark:text-gray-400'>No results found</div>

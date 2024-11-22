@@ -1,12 +1,10 @@
-// error.tsx
 'use client';
 
+// this will automatically work for Serverside Rendered Components (SearchResults.tsx)
 export default function Error({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
 }) {
   return (
     <div className='fixed inset-0 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm z-50'>
