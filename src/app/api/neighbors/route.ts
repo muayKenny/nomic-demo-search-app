@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AtlasViewer, AtlasDataset } from '@nomic-ai/atlas';
 
 export async function GET(req: NextRequest) {
-  // Zod schema validations for paramters
+  // can use Zod schema validations for parameters
   const { searchParams } = new URL(req.url);
   const input = searchParams.get('input')!;
   const k = searchParams.get('k') || '10';
