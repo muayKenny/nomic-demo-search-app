@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DarkModeToggle from '@/components/DarkMode';
-import SearchResults from '@/app/search/SearchResults';
+import SearchResults, { Result } from '@/app/search/SearchResults';
 import { Loading } from '@/components/Loading';
 
 const SearchPage = () => {
@@ -16,9 +16,9 @@ const SearchPage = () => {
 
   const [input, setInput] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [k, setK] = useState(initialK);
+  const [results, setResults] = useState<Result[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const updateURL = (newQuery: string, newK: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -50,10 +50,11 @@ const SearchPage = () => {
         throw new Error(errorData.error || 'Failed to fetch results');
       }
 
-      const data = await response.json();
+      const data: Result[] = await response.json();
       console.log('# of results: ', data.length);
       setResults(data);
     } catch (error) {
+      // error.tsx has caught this
       throw error;
     } finally {
       setLoading(false);

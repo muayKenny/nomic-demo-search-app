@@ -1,11 +1,11 @@
 import { extractSrc } from '@/utils/utils';
 
-type Result = {
+export interface Result {
   id: string;
   img_text_sim: number;
   text: string;
   img: string;
-};
+}
 
 interface SearchResultsProps {
   results: Result[];
