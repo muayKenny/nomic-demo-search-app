@@ -16,7 +16,7 @@ const DarkModeToggle = () => {
   return (
     <button
       onClick={() => setIsDarkMode(!isDarkMode)}
-      className="p-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded"
+      className='p-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded'
     >
       {isDarkMode ? 'Light Mode' : 'Dark Mode'}
     </button>

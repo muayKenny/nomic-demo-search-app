@@ -1,3 +1,32 @@
+# Search Page Improvement
+
+## What I added
+
+- Search state persists through URL parameters, enabling sharing and bookmarking
+- Added configurable number of results (k) with validation
+- Enhanced state management to handle input/query separately
+- Added proper TypeScript interfaces for data structures
+- Improved error handling through Next.js error boundaries
+- Added environment variable support for API URL
+
+## How to Test It Out
+
+1. Try a Search
+
+   - Enter a text query and hit search
+   - You should see nearest neighbor results with their similarity scores
+   - Watch for the loading state while it searches
+
+2. Adjust Neighbor Count
+
+   - Try changing the k value to get more/fewer similar results
+   - Results should update automatically
+
+3. Check URL Features
+   - After searching, copy the URL
+   - Opening in a new tab should find the same neighbors
+   - Bookmarking should preserve your search
+
 # Nomic Web Engineer Interview Exercise
 
 ## Introduction
@@ -22,12 +51,11 @@ Your improvements can involve any aspect of the application, including (but not 
 
 - Feel free to leave areas marked as TODO or implement stubs of functions, classes, or components that you don't fully use if you think they'd be fruitful for discussion.
 
- - That said, it would be best if you did so in a way that `npm run dev` still runs on your branch so we can see your changes in action.
- 
+- That said, it would be best if you did so in a way that `npm run dev` still runs on your branch so we can see your changes in action.
 
 - Create one or more PRs with your improvements. In each PR, include a brief description of the changes you made and why you made them at the bottom of this README.
 
-- You can use LLMs like Claude or GitHub copilot in whatever way you see fit. (We would!) You should be prepared to discuss both architectural decisions and low-level implementations in the interview. 
+- You can use LLMs like Claude or GitHub copilot in whatever way you see fit. (We would!) You should be prepared to discuss both architectural decisions and low-level implementations in the interview.
 
 ## Setup
 

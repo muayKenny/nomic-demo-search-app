@@ -1,67 +1,125 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Embedder, AtlasViewer, AtlasDataset, AtlasProjection } from '@nomic-ai/atlas';
+import { AtlasViewer, AtlasDataset } from '@nomic-ai/atlas';
 
 export async function GET(req: NextRequest) {
+  // can use Zod schema validations for parameters
   const { searchParams } = new URL(req.url);
   const input = searchParams.get('input')!;
-  const k = searchParams.get('k') || "10";
+  const k = searchParams.get('k') || '10';
 
-  // We hard-code an image dataset here. Could change though to other datasets, text or images.
-  const projectionId = searchParams.get('projectionId') || 'ad24e7d9-4e82-484d-a52c-79fed0da2c60'
-  const datasetId = searchParams.get('datasetId') || '7eafc0fa-9631-4387-8f68-ae81ab61398d'
+  if (!input) {
+    return NextResponse.json(
+      { error: 'Input parameter is required' },
+      { status: 400 }
+    );
+  }
 
-  const apiKey = process.env.PRIVATE_ATLAS_API_KEY
+  const kNumber = Number(k);
+  if (isNaN(kNumber) || kNumber <= 0) {
+    return NextResponse.json(
+      { error: 'Invalid value for k. It should be a positive number.' },
+      { status: 400 }
+    );
+  }
+  // Default projection and dataset IDs for KNN queries.
+  // These can be overridden by providing 'projectionId' and 'datasetId' as query parameters.
+  const projectionId =
+    searchParams.get('projectionId') || process.env.DEFAULT_PROJECTION_ID;
+  const datasetId =
+    searchParams.get('datasetId') || process.env.DEFAULT_DATASET_ID;
+  //should probably validate uuid for both
+  if (!projectionId) {
+    return NextResponse.json(
+      { error: 'projectionId not found' },
+      { status: 400 }
+    );
+  }
+  if (!datasetId) {
+    return NextResponse.json({ error: 'datasetId not found' }, { status: 400 });
+  }
+
+  const apiKey = process.env.PRIVATE_ATLAS_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'API key not found' }, { status: 500 });
   }
-  const viewer = new AtlasViewer({apiKey})
+  const viewer = new AtlasViewer({ apiKey });
 
-  const search = `data:text/utf-8;charset=utf-8,${encodeURIComponent(input)}`
-  const url = "https://api-atlas.nomic.ai/v1/query/topk"
+  const search = `data:text/utf-8;charset=utf-8,${encodeURIComponent(input)}`;
+  const url = 'https://api-atlas.nomic.ai/v1/query/topk';
 
   // See: https://docs.nomic.ai/reference/api/query/k-nn-search
   const payload = {
-      "projection_id": projectionId,
-      "k": Number(k),
-      "query": search,
-      "selection": {
-          "polarity": true,
-          "method": "composition",
-          "conjunctor": "ALL",
-          "filters": [
-            // This is really dumb, but we have to pass some query to the API as currently set up.
-            // So we just pass a query that won't match anything.
-              {
-                  "method": "search",
-                  "query": "some made up query that won't occur in the data",
-                  "field": "text",
-                  "polarity": false, // Only *don'* match this query
-              }
-          ]
-        }
-    }
+    projection_id: projectionId,
+    k: Number(k),
+    query: search,
+    selection: {
+      polarity: true,
+      method: 'composition',
+      conjunctor: 'ALL',
+      filters: [
+        // This is really dumb, but we have to pass some query to the API as currently set up.
+        // So we just pass a query that won't match anything.
+        {
+          method: 'search',
+          query: "some made up query that won't occur in the data",
+          field: 'text',
+          polarity: false, // Only *don'* match this query
+        },
+      ],
+    },
+  };
 
-    const headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-    }
-
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+  };
 
   // return NextResponse.json({ input, k, projectionId, apiKey, url, payload, headers });
   try {
     const result = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload)
-    }).then(async res => {
-      const body = await res.json()
-      const dataset = new AtlasDataset(datasetId, viewer);
-      const data = await dataset.fetch_ids(body.data.map(d => d.id))
-      return data.datums
-  });
-    return NextResponse.json(result);
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    if (!result.ok) {
+      throw new Error(
+        `Request failed with status ${result.status}: ${result.statusText}`
+      );
+    }
+
+    const body = await result.json();
+
+    if (!body.data || !Array.isArray(body.data)) {
+      throw new Error(
+        'Invalid response structure: Missing or malformed "data" field'
+      );
+    }
+
+    const dataset = new AtlasDataset(datasetId, viewer);
+    const data = await dataset.fetch_ids(
+      body.data.map((d: { id: string }) => d.id)
+    );
+
+    return NextResponse.json(data.datums);
   } catch (error) {
-    // console.error(error);
-    return NextResponse.json({ error: 'Failed to fetch neighbors' }, { status: 500 });
+    // Log the error for debugging
+    console.error('Error in KNN query:', error);
+
+    // Handle specific error cases
+    if (error instanceof Error) {
+      if (error.message.includes('Request failed with status')) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      if (error.message.includes('Invalid response structure')) {
+        return NextResponse.json({ error: error.message }, { status: 422 });
+      }
+    }
+
+    // Fallback for unexpected errors
+    return NextResponse.json(
+      { error: 'An unexpected error occurred. Please try again later.' },
+      { status: 500 }
+    );
   }
 }
