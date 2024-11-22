@@ -1,26 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DarkModeToggle from '@/components/DarkMode';
 import SearchResults from '@/app/search/SearchResults';
 import { Loading } from '@/components/Loading';
 
-interface SearchPageProps {
-  searchParams: {
-    query?: string;
-  };
-}
+const SearchPage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-const SearchPage = ({ searchParams }: SearchPageProps) => {
-  const initialQuery = searchParams?.query || '';
+  // Initialize state from URL parameters or defaults
+  const initialQuery = searchParams.get('query') || '';
+  const initialK = parseInt(searchParams.get('k') || '20', 10);
+
   const [input, setInput] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [k, setK] = useState(20);
-  // add more filters into state
+  const [k, setK] = useState(initialK);
 
-  const fetchResults = async (query: string) => {
+  const updateURL = (newQuery: string, newK: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('query', newQuery);
+    params.set('k', newK.toString());
+
+    const newURL = `${window.location.pathname}${
+      params.toString() ? '?' + params.toString() : ''
+    }`;
+    // Update URL without reloading the page
+    router.push(newURL, { scroll: false });
+  };
+
+  const fetchResults = async (queryText: string) => {
     setLoading(true);
 
     try {
@@ -28,9 +40,8 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
         '/api/neighbors',
         process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       );
-      url.searchParams.set('input', query);
+      url.searchParams.set('input', queryText);
       url.searchParams.set('k', k.toString());
-      // add filters into params
 
       const response = await fetch(url);
 
@@ -40,18 +51,27 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
       }
 
       const data = await response.json();
+      console.log('# of results: ', data.length);
       setResults(data);
     } catch (error) {
-      // implement custom clientside error boudary
       throw error;
     } finally {
-      setLoading(false); // Ensure loading state is always cleared
+      setLoading(false);
     }
   };
 
   const handleSearch = () => {
     if (input.trim()) {
       setQuery(input);
+      updateURL(input, k);
+    }
+  };
+
+  const handleKChange = (newK: number) => {
+    const validK = Math.min(50, Math.max(1, newK));
+    setK(validK);
+    if (query) {
+      updateURL(query, validK);
     }
   };
 
@@ -59,7 +79,7 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
     if (query) {
       fetchResults(query);
     }
-  }, [query]);
+  }, [query, k]);
 
   return (
     <div className='min-h-screen bg-gray-100 dark:bg-gray-900 p-4'>
@@ -72,8 +92,8 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
       <div className='mb-4'>
         <form
           onSubmit={(e) => {
-            e.preventDefault(); // Prevent default form submission behavior
-            handleSearch(); // Call the search handler
+            e.preventDefault();
+            handleSearch();
           }}
         >
           <div className='flex items-center gap-2'>
@@ -86,7 +106,7 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
               className='p-2 border border-gray-300 rounded w-1/4 text-gray-900 bg-white dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700'
             />
             <button
-              type='submit' // Make this a submit button
+              type='submit'
               className='p-2 bg-blue-500 text-white rounded dark:bg-blue-700'
             >
               Search
@@ -107,11 +127,7 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
             type='number'
             min='1'
             value={k}
-            onChange={(e) =>
-              setK(
-                Math.min(100, Math.max(1, parseInt(e.target.value, 10) || 1))
-              )
-            }
+            onChange={(e) => handleKChange(parseInt(e.target.value, 10) || 1)}
             placeholder='Number of results (k)'
             className='p-2 border border-gray-300 rounded w-1/8 text-gray-900 bg-white dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700'
           />
