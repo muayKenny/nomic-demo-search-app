@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Suspense } from 'react';
 import DarkModeToggle from '@/components/DarkMode';
 import SearchResults from '@/app/search/SearchResults';
 import { Loading } from '@/components/Loading';
@@ -14,11 +13,12 @@ interface SearchPageProps {
 
 const SearchPage = ({ searchParams }: SearchPageProps) => {
   const initialQuery = searchParams?.query || '';
-  const [input, setInput] = useState(initialQuery); // Tracks the input value
-  const [query, setQuery] = useState(initialQuery); // Tracks the submitted query
-  const [results, setResults] = useState<any[]>([]); // Stores fetched results
-  const [loading, setLoading] = useState(false); // Loading state
-  const [k, setK] = useState(20); // Default number of results to fetch
+  const [input, setInput] = useState(initialQuery);
+  const [query, setQuery] = useState(initialQuery);
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [k, setK] = useState(20);
+  // add more filters into state
 
   const fetchResults = async (query: string) => {
     setLoading(true);
@@ -30,6 +30,7 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
       );
       url.searchParams.set('input', query);
       url.searchParams.set('k', k.toString());
+      // add filters into params
 
       const response = await fetch(url);
 
@@ -69,42 +70,52 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
         <DarkModeToggle />
       </div>
       <div className='mb-4'>
-        <div className='flex items-center gap-2'>
-          <input
-            type='text'
-            name='query'
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder='Search...'
-            className='p-2 border border-gray-300 rounded w-1/4 text-gray-900 bg-white dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700'
-          />
-          <button
-            onClick={handleSearch}
-            type='submit'
-            className='p-2 bg-blue-500 text-white rounded dark:bg-blue-700'
-          >
-            Search
-          </button>
-        </div>
-      </div>
-      <div className='mb-4'>
-        <label
-          htmlFor='k-input'
-          className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // Prevent default form submission behavior
+            handleSearch(); // Call the search handler
+          }}
         >
-          Number of results (k)
-        </label>
-        <input
-          id='k-input'
-          type='number'
-          min='1'
-          value={k}
-          onChange={(e) =>
-            setK(Math.max(1, parseInt(e.target.value, 120) || 1))
-          }
-          placeholder='Number of results (k)'
-          className='p-2 border border-gray-300 rounded w-1/8 text-gray-900 bg-white dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700'
-        />
+          <div className='flex items-center gap-2'>
+            <input
+              type='text'
+              name='query'
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder='Search...'
+              className='p-2 border border-gray-300 rounded w-1/4 text-gray-900 bg-white dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700'
+            />
+            <button
+              type='submit' // Make this a submit button
+              className='p-2 bg-blue-500 text-white rounded dark:bg-blue-700'
+            >
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
+      <div className='mb-4 flex gap-10'>
+        <div>
+          <label
+            htmlFor='k-input'
+            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+          >
+            Number of results (k)
+          </label>
+          <input
+            id='k-input'
+            type='number'
+            min='1'
+            value={k}
+            onChange={(e) =>
+              setK(
+                Math.min(100, Math.max(1, parseInt(e.target.value, 10) || 1))
+              )
+            }
+            placeholder='Number of results (k)'
+            className='p-2 border border-gray-300 rounded w-1/8 text-gray-900 bg-white dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700'
+          />
+        </div>
       </div>
 
       {loading && <Loading />}

@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const input = searchParams.get('input')!;
   const k = searchParams.get('k') || '10';
+  // digest filters and build filter array!
 
   if (!input) {
     return NextResponse.json(
